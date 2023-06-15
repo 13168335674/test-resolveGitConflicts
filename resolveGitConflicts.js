@@ -2,7 +2,7 @@
 
 async function resolveGitConflicts() {
   // 判断是否有冲突文件
-  const conflictFiles = await $`git diff --name-only --diff-filter=U`;
+  const conflictFiles = (await $`git diff --name-only --diff-filter=U`).trim();
   if (!conflictFiles) {
     console.log('没有Git冲突文件');
     return;
@@ -12,7 +12,7 @@ async function resolveGitConflicts() {
   for (const file of conflictFiles.split('\n')) {
     if (file.endsWith('index.src.js')) {
       await $`git checkout --ours ${file}`;
-      console.log(`已使用当前文件内容覆盖旧的内容: ${file}`);
+      await $`git add ${file}`;
     }
   }
   console.log('Git冲突已自动解决');
