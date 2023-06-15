@@ -7,6 +7,8 @@ async function resolveGitConflicts() {
   ).trim();
   if (!conflictFiles) {
     console.log('没有Git冲突文件');
+    await $`yarn build`;
+    console.log('yarn build命令已执行');
     return;
   }
 
@@ -19,7 +21,17 @@ async function resolveGitConflicts() {
       console.log(`已将文件标记为已解决: ${file}`);
     }
   }
-  console.log('Git冲突已自动解决');
+
+  // 判断是否有未解决的冲突文件
+  const remainingConflicts = String(
+    await $`git diff --name-only --diff-filter=U`
+  ).trim();
+  if (remainingConflicts) {
+    console.log(`以下文件存在冲突需要等待处理: ${remainingConflicts}`);
+  } else {
+    await $`yarn build`;
+    console.log('yarn build命令已执行');
+  }
 }
 
 resolveGitConflicts();
